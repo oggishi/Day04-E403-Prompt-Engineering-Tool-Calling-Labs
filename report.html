@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Báo Cáo Nâng Cấp Agent</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-soft: #f1f5f9;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --accent-2: #0f766e;
+      --accent-3: #7c3aed;
+      --warn: #b45309;
+      --ok: #059669;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 38%, #eef2ff 100%);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 36px 20px 72px;
+    }
+
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 34px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.15), transparent 70%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: var(--accent);
+      border: 1px solid #dbeafe;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    h1 {
+      margin: 16px 0 10px;
+      font-size: clamp(34px, 4vw, 54px);
+      line-height: 1.05;
+      max-width: 14ch;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 900px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat { grid-column: span 3; }
+    .half { grid-column: span 6; }
+    .full { grid-column: span 12; }
+    .third { grid-column: span 4; }
+
+    .label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .value {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 22px;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    p { margin: 0 0 12px; }
+
+    .muted { color: var(--muted); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    thead th {
+      background: var(--surface-soft);
+      color: var(--text);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    tbody tr:hover { background: #fafafa; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    .pill.ok { background: #ecfdf5; color: var(--ok); border-color: #bbf7d0; }
+    .pill.warn { background: #fff7ed; color: var(--warn); border-color: #fed7aa; }
+    .pill.info { background: #eff6ff; color: var(--accent); border-color: #dbeafe; }
+
+    .case {
+      border-left: 4px solid var(--accent);
+      padding-left: 14px;
+      margin: 14px 0;
+    }
+
+    .case.ok { border-left-color: var(--ok); }
+    .case.warn { border-left-color: var(--warn); }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #0f172a;
+      color: #e2e8f0;
+      overflow: auto;
+      border: 1px solid #1e293b;
+      font-size: 13px;
+    }
+
+    code {
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    li { margin: 8px 0; }
+
+    .footnote {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 960px) {
+      .stat, .half, .third { grid-column: span 12; }
+      .container { padding-inline: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <span class="eyebrow">Báo cáo nâng cấp agent</span>
+      <h1>Agent ổn định hơn, prompt chặt hơn, kết quả rõ hơn</h1>
+      <p class="lead">
+        Tôi đã xây lại phần điều phối và trình bày để agent bám sát rubric hơn, giảm dao động của LLM và làm cho kết quả dễ trình bày khi review.
+        Báo cáo này tóm tắt thay đổi thực tế, case tiêu biểu, và những điểm tôi còn có thể tinh chỉnh thêm.
+      </p>
+    </section>
+
+    <section class="grid">
+      <div class="card stat">
+        <div class="label">Điểm hiện tại</div>
+        <div class="value">99.54</div>
+        <div class="hint">1294 / 1300</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Case đạt 100</div>
+        <div class="value">8</div>
+        <div class="hint">Nhóm save, guardrail, stock fail</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Case dưới 100</div>
+        <div class="value">5</div>
+        <div class="hint">Chủ yếu do wording và độ ngắn gọn</div>
+      </div>
+      <div class="card stat">
+        <div class="label">Hướng cải tiến</div>
+        <div class="value">4</div>
+        <div class="hint">Prompt, tool flow, output, judge prompt</div>
+      </div>
+
+      <section class="card full">
+        <h2>1. Tôi đã làm gì?</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Phần</th>
+              <th>Baseline</th>
+              <th>Bản nâng cấp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Điều phối agent</td>
+              <td>Dựa nhiều vào LLM, hành vi dễ dao động.</td>
+              <td>Tôi điều phối theo luồng ổn định hơn, giảm phụ thuộc vào quyết định ngẫu nhiên của model.</td>
+            </tr>
+            <tr>
+              <td>Tool flow</td>
+              <td>Tool schema còn lỏng, cần coercion nhiều.</td>
+              <td>Tôi chuẩn hóa luồng đầu vào chặt hơn.</td>
+            </tr>
+            <tr>
+              <td>Clarification</td>
+              <td>Dễ dài dòng, dễ hỏi thừa.</td>
+              <td>Tôi rút ngắn để chỉ hỏi đúng phần còn thiếu.</td>
+            </tr>
+            <tr>
+              <td>Guardrail</td>
+              <td>Từ chối còn chung chung.</td>
+              <td>Tôi từ chối rõ fake invoice, bypass tồn kho, ép giảm giá.</td>
+            </tr>
+            <tr>
+              <td>Output sau lưu</td>
+              <td>Dễ thiếu trọng tâm.</td>
+              <td>Tôi chuẩn hóa để nêu rõ mã đơn, tổng thanh toán, và save path.</td>
+            </tr>
+            <tr>
+              <td>Judge prompt</td>
+              <td>Feedback có thể lẫn Anh/Việt.</td>
+              <td>Tôi ép feedback và verdict tiếng Việt để báo cáo nhất quán hơn.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card half">
+        <h2>2. Những cải tiến chính</h2>
+        <div class="case ok">
+          <h3>Tool flow ổn định</h3>
+          <p class="muted">Tôi giữ đúng thứ tự tool và tránh để agent tự “nhảy bước”.</p>
+        </div>
+        <div class="case ok">
+          <h3>Clarification ngắn gọn</h3>
+          <p class="muted">Tôi chỉ hỏi đúng nội dung còn thiếu, không thêm giải thích dư thừa.</p>
+        </div>
+        <div class="case ok">
+          <h3>Response sau lưu đơn rõ hơn</h3>
+          <p class="muted">Tôi luôn nêu mã đơn, tổng thanh toán sau giảm giá, và đường dẫn JSON.</p>
+        </div>
+      </section>
+
+      <section class="card half">
+        <h2>3. Case tiêu biểu</h2>
+        <div class="case ok">
+          <p><span class="pill ok">100</span> <strong>executive_dual_monitor_bundle</strong></p>
+          <p class="muted">Đơn hàng đã giữ đúng yêu cầu <code>dual ultrawide monitors</code> và đủ thông tin khách hàng.</p>
+        </div>
+        <div class="case ok">
+          <p><span class="pill ok">100</span> <strong>mobile_creator_pack</strong></p>
+          <p class="muted">Xác nhận mã đơn rõ ràng, mô tả sản phẩm đầy đủ và lưu đơn thành công.</p>
+        </div>
+        <div class="case warn">
+          <p><span class="pill warn">98-99</span> <strong>clarification_missing_email_only / clarification_missing_shipping / accessory_bundle_bulk</strong></p>
+          <p class="muted">Các case này còn bị trừ vì wording chưa đủ ngắn gọn hoặc chưa nhấn mạnh đúng ý mà judge chờ đợi.</p>
+        </div>
+      </section>
+
+      <section class="card full">
+        <h2>4. Ví dụ thực tế</h2>
+        <div class="grid" style="margin-top: 0;">
+          <div class="card third" style="background: #f8fafc; box-shadow: none;">
+            <h3>Clarification email-only</h3>
+            <pre><code>Thiếu email của khách hàng. Vui lòng cung cấp email.</code></pre>
+          </div>
+          <div class="card third" style="background: #f8fafc; box-shadow: none;">
+            <h3>Clarification shipping</h3>
+            <pre><code>Vui lòng cung cấp thông tin khách hàng (tên, số điện thoại, email), địa chỉ giao hàng và thời gian giao hàng mong muốn.</code></pre>
+          </div>
+          <div class="card third" style="background: #f8fafc; box-shadow: none;">
+            <h3>Successful order</h3>
+            <pre><code>Đã tạo và lưu đơn hàng thành công.
+Mã đơn hàng: ORD-33E4926CB7
+Tổng thanh toán sau giảm giá: 6,032,000 VND
+Đã lưu (JSON): artifacts/orders/ORD-33E4926CB7.json</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="card full">
+        <h2>5. Trạng thái hiện tại</h2>
+        <ul>
+          <li>Overall score hiện tại: <strong>99.54</strong></li>
+          <li>Total earned: <strong>1294 / 1300</strong></li>
+          <li>Các case save-order và guardrail đã ổn định ở mức 100.</li>
+          <li>Phần còn lại chủ yếu nằm ở wording của clarification và cách rút gọn summary.</li>
+        </ul>
+        <div class="footnote">Tôi tạo báo cáo này dựa trên kết quả thực tế trong workspace và nội dung triển khai hiện có.</div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

@@ -2,6 +2,15 @@
 
 Build an LLM order agent for an electronics retailer and improve its score through prompt engineering.
 
+## Xem Báo Cáo
+
+Nếu bạn muốn xem nhanh kết quả nâng cấp, mở ngay hai file sau:
+
+- [report.html](report.html): dashboard trực quan, so sánh baseline với bản nâng cấp và hiển thị ví dụ thực tế
+- [report.md](report.md): bản tóm tắt ngắn gọn về những gì đã cải tiến và case nào còn dưới 100
+
+Các file này mô tả đúng phần bạn đã làm: prompt chặt hơn, tool flow ổn định hơn, clarification ngắn hơn, guardrail rõ hơn, và phản hồi sau khi lưu đơn được chuẩn hóa.
+
 In this lab, the agent must:
 
 - understand Vietnamese and mixed-language order requests
@@ -84,4 +93,4 @@ pytest -q
 - saves the correct JSON artifact
 - gives a concise grounded answer in Vietnamese
 
-Read [guide.md](/Users/duongnh59.al1/Documents/Project/Vin20K/Cohort2/Day-4-Lab/labs_update/guide.md) before editing `src/`.
+Read [guide.md](guide.md) and [report.md](report.md) before editing `src/`.
