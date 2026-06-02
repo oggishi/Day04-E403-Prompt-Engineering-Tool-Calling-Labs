@@ -15,7 +15,7 @@ def _load_system_prompt() -> str:
     return ""
 
 SYSTEM_PROMPT: str = _load_system_prompt() or (
-    "Luôn trả lời bằng tiếng Việt. Tuân thủ chính sách không bịa thông tin và yêu cầu thông tin khách hàng đầy đủ trước khi gọi công cụ."
+    "Luôn trả lời bằng tiếng Việt. Không bịa thông tin. Nếu yêu cầu không an toàn thì từ chối ngay và không gọi công cụ. Nếu thiếu thông tin khách hàng thì hỏi đúng phần còn thiếu trước khi gọi công cụ."
 )
 
 # Trường tối thiểu bắt buộc trước khi gọi công cụ
@@ -24,9 +24,7 @@ REQUIRED_FIELDS = [
     "phone",
     "email",
     "shipping_address",
-    "payment_method",
     "items",  # list of {sku, quantity}
-    "accepted_terms",
 ]
 
 FORBIDDEN_ACTION_KEYWORDS = [
@@ -40,7 +38,6 @@ FORBIDDEN_ACTION_KEYWORDS = [
 
 
 def missing_fields(order: Dict[str, Any]) -> List[str]:
-    
     missing = []
     for fld in REQUIRED_FIELDS:
         if fld not in order or order[fld] in (None, "", [], {}):
@@ -63,9 +60,15 @@ def missing_fields(order: Dict[str, Any]) -> List[str]:
 def can_call_tools(order: Dict[str, Any]) -> Tuple[bool, str]:
     m = missing_fields(order)
     if m:
-        return False, (
-            "Thiếu thông tin — không thể gọi công cụ. Vui lòng cung cấp các trường: " + ", ".join(m)
-        )
+        labels = {
+            "customer_name": "tên khách hàng",
+            "phone": "số điện thoại",
+            "email": "email",
+            "shipping_address": "địa chỉ giao hàng",
+            "items": "ít nhất một sản phẩm và số lượng tương ứng",
+        }
+        requested = ", ".join(labels.get(field, field) for field in m)
+        return False, "Thiếu thông tin — không thể gọi công cụ. Vui lòng bổ sung: " + requested
     return True, ""
 
 

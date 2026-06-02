@@ -276,10 +276,11 @@ class OrderDataStore:
                 "campaign_code": campaign_code,
                 "customer_tier": customer_tier,
             },
-            "notes": notes.strip(),
-            "save_path": str(relative_path),
+            "save_path": relative_path.as_posix(),
             "source": "llm-order-agent",
         }
+        if notes.strip():
+            payload["notes"] = notes.strip()
         absolute_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
         return {
             "status": "saved",

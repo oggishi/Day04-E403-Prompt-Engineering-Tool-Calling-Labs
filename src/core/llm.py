@@ -41,15 +41,27 @@ def build_chat_model(
     """
 
     if provider == "google":
+        # Legacy alias: prefer OPENROUTER vars, but fall back to OPENAI if available.
         from langchain_openai import ChatOpenAI
 
+        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        base_url = os.getenv("OPENROUTER_BASE_URL") or os.getenv("OPENAI_API_BASE")
         return ChatOpenAI(
             model=model_name or os.getenv("LLM_MODEL"),
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-            base_url=os.getenv(
-                "OPENROUTER_BASE_URL",
-                "https://openrouter.ai/api/v1",
-            ),
+            api_key=api_key,
+            base_url=base_url,
+            temperature=temperature,
+        )
+
+    if provider == "openai":
+        from langchain_openai import ChatOpenAI
+
+        api_key = os.getenv("OPENAI_API_KEY")
+        base_url = os.getenv("OPENAI_API_BASE")
+        return ChatOpenAI(
+            model=model_name or os.getenv("LLM_MODEL"),
+            api_key=api_key,
+            base_url=base_url if base_url else None,
             temperature=temperature,
         )
 
@@ -69,7 +81,7 @@ def build_chat_model(
         )
 
     raise ValueError(
-        "This lab supports only the `google` and `ollama` providers."
+        "This lab supports only the `google`, `openai` and `ollama` providers."
     )
 
 

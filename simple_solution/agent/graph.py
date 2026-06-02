@@ -11,12 +11,6 @@ from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.tools import tool
 
 from simple_solution.utils.data_store import OrderDataStore
-from src.agent.prompt import (
-    can_call_tools,
-    is_unsafe_request,
-    can_save_order,
-    missing_fields,
-)
 from src.core.llm import build_chat_model, normalize_content
 from src.core.schemas import AgentResult, OrderLineInput, ToolCallRecord
 
@@ -26,15 +20,17 @@ DEFAULT_OUTPUT_DIR = ROOT_DIR / "artifacts" / "orders"
 
 
 def build_system_prompt(today: str | None = None) -> str:
-    # Prefer to use the centralized SYSTEM_PROMPT (Vietnamese) when available.
-    try:
-        from src.agent.prompt import SYSTEM_PROMPT
-    except Exception:
-        SYSTEM_PROMPT = "You are an order assistant. Answer in Vietnamese. Keep the answer short."  # fallback
-
     current_day = today or "2026-06-01"
-    header = f"Hôm nay là {current_day}.\n"
-    return (header + "\n" + SYSTEM_PROMPT).strip()
+    return f"""
+You are an order assistant.
+Today is {current_day}.
+
+Try to help the user make an order with the tools.
+Usually check products, then pricing, then save.
+If something is missing or unsafe, handle it as best as you can.
+Answer in Vietnamese.
+Keep the answer short.
+""".strip()
 
 
 def build_tools(store: OrderDataStore):
@@ -71,10 +67,6 @@ def build_tools(store: OrderDataStore):
     def get_discount(customer: str = "") -> str:
         """Get discount."""
         customer_text = customer.strip()
-        # Basic safety check: refuse unsafe requests
-        unsafe, reason = is_unsafe_request(customer_text)
-        if unsafe:
-            return json.dumps({"status": "error", "error": "Yêu cầu không an toàn — không gọi công cụ."}, ensure_ascii=False)
         seed_hint = customer_text
         customer_tier = "standard"
         if customer_text:
@@ -96,37 +88,7 @@ def build_tools(store: OrderDataStore):
     def save_order(order_payload: str = "") -> str:
         """Save order."""
         payload = _coerce_object(order_payload)
-
-        # Map payload to the minimal order structure expected by can_call_tools
-        order_check = {
-            "customer_name": payload.get("customer_name") or payload.get("customer") or "",
-            "phone": payload.get("customer_phone") or payload.get("phone") or "",
-            "email": payload.get("customer_email") or payload.get("email") or "",
-            "shipping_address": payload.get("shipping_address") or "",
-            "payment_method": payload.get("payment_method") or "",
-            "items": payload.get("items") or [],
-            "accepted_terms": payload.get("accepted_terms") or payload.get("accepted_terms", False),
-        }
-
-        ok, msg = can_call_tools(order_check)
-        if not ok:
-            return json.dumps({"status": "error", "error": msg}, ensure_ascii=False)
-
-        # Coerce items and perform pricing/inventory check via store
         items = _coerce_items(payload.get("items", []))
-        pricing = store.calculate_order_totals(items=items, detail_token=str(payload.get("detail_token", "")), discount_rate=float(payload.get("discount_rate", 0.0)))
-        checks = {
-            "inventory_ok": pricing.get("status") == "ok",
-            "price_ok": pricing.get("status") == "ok",
-            "payment_ok": bool(payload.get("payment_method")),
-            "customer_confirmed": bool(payload.get("accepted_terms")),
-        }
-
-        can_save, save_msg = can_save_order(order_check, checks)
-        if not can_save:
-            return json.dumps({"status": "error", "error": save_msg, "pricing": pricing}, ensure_ascii=False)
-
-        # Proceed to save
         result = store.save_order(
             customer_name=str(payload.get("customer_name", "")),
             customer_phone=str(payload.get("customer_phone", "")),
